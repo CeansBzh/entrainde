@@ -91,8 +91,56 @@ button {
   outline: none;
 }
 
-#greet-input {
+.input-container {
+  position: relative;
+  flex: 1;
   margin-right: 5px;
+}
+
+#task-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.suggestion-item {
+  padding: 0.8em 1.2em;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.suggestion-item:hover {
+  background-color: #f0f0f0;
+}
+
+.suggestion-item:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.suggestion-item:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+#status-msg {
+  margin-top: 1em;
+  min-height: 1.5em;
+  color: #4caf50;
+  font-weight: 500;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -112,5 +160,18 @@ button {
   }
   button:active {
     background-color: #0f0f0f69;
+  }
+
+  .suggestions {
+    background-color: #1f1f1f;
+    border-color: #444;
+  }
+
+  .suggestion-item:hover {
+    background-color: #333;
+  }
+
+  #status-msg {
+    color: #81c784;
   }
 }

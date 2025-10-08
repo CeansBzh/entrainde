@@ -9,6 +9,8 @@
     "core:default",
     "opener:default",
     "core:app:allow-default-window-icon",
-    "positioner:default"
+    "positioner:default",
+    "store:allow-load",
+    "store:default"
   ]
 }

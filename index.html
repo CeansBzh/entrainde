@@ -10,13 +10,16 @@
 
   <body>
     <main class="container">
-      <h1>Je suis en train de...</h1>
+      <h1>En train de...</h1>
 
-      <form class="row" id="greet-form">
-        <input id="greet-input" placeholder="Enter a name..." />
-        <button type="submit">Greet</button>
+      <form class="row" id="task-form">
+        <div class="input-container">
+          <input id="task-input" placeholder="Entrez votre tâche actuelle..." autocomplete="off" />
+          <div id="suggestions" class="suggestions"></div>
+        </div>
+        <button type="submit">Enregistrer</button>
       </form>
-      <p id="greet-msg"></p>
+      <p id="status-msg"></p>
     </main>
   </body>
 </html>

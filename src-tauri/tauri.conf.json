@@ -14,7 +14,7 @@
     "windows": [
       {
         "title": "entrainde",
-        "width": 350,
+        "width": 400,
         "height": 250,
         "visible": false,
         "skipTaskbar": true

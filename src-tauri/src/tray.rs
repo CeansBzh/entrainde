@@ -1,16 +1,17 @@
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    AppHandle,
+    AppHandle, Manager,
 };
 
-use crate::window;
+use crate::{clear_all_tasks, window};
 
 pub fn create(app_handle: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     // Create the tray menu
     let open_i = MenuItem::with_id(app_handle, "open", "Ouvrir", true, None::<&str>)?;
+    let clear_i = MenuItem::with_id(app_handle, "clear", "Effacer toutes les tâches", true, None::<&str>)?;
     let quit_i = MenuItem::with_id(app_handle, "quit", "Quitter", true, None::<&str>)?;
-    let menu = Menu::with_items(app_handle, &[&open_i, &quit_i])?;
+    let menu = Menu::with_items(app_handle, &[&open_i, &clear_i, &quit_i])?;
 
     TrayIconBuilder::new()
         .icon(app_handle.default_window_icon().unwrap().clone())
@@ -36,6 +37,9 @@ pub fn create(app_handle: &AppHandle) -> Result<(), Box<dyn std::error::Error>> 
             }
             "open" => {
                 window::show_main_window(app_handle);
+            }
+            "clear" => {
+                clear_all_tasks(app_handle.state::<crate::AppState>()).unwrap();
             }
             _ => {
                 println!("menu item {:?} not handled", event.id);
