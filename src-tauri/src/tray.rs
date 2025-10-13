@@ -1,15 +1,23 @@
+use std::sync::atomic::Ordering;
+use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager,
 };
 
-use crate::{clear_all_tasks, window};
+use crate::{clear_all_tasks, window, AppState};
 
 pub fn create(app_handle: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     // Create the tray menu
     let open_i = MenuItem::with_id(app_handle, "open", "Ouvrir", true, None::<&str>)?;
-    let clear_i = MenuItem::with_id(app_handle, "clear", "Effacer toutes les tâches", true, None::<&str>)?;
+    let clear_i = MenuItem::with_id(
+        app_handle,
+        "clear",
+        "Effacer toutes les tâches",
+        true,
+        None::<&str>,
+    )?;
     let quit_i = MenuItem::with_id(app_handle, "quit", "Quitter", true, None::<&str>)?;
     let menu = Menu::with_items(app_handle, &[&open_i, &clear_i, &quit_i])?;
 
@@ -18,14 +26,29 @@ pub fn create(app_handle: &AppHandle) -> Result<(), Box<dyn std::error::Error>> 
         .on_tray_icon_event(|tray_handle, event| {
             tauri_plugin_positioner::on_tray_event(tray_handle.app_handle(), &event);
 
-            if let TrayIconEvent::Click {
-                button: MouseButton::Left,
-                button_state: MouseButtonState::Up,
-                ..
-            } = event
-            {
-                // Handle left click on the tray icon to toggle the main window
-                window::toggle_main_window(&tray_handle.app_handle());
+            match event {
+                TrayIconEvent::Click {
+                    button: MouseButton::Left,
+                    button_state: MouseButtonState::Up,
+                    ..
+                } => {
+                    let app_handle = tray_handle.app_handle();
+                    let state = app_handle.state::<AppState>();
+
+                    let now = SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .unwrap()
+                        .as_millis() as u64;
+                    let last_minimize = state.last_focus_loss_minimize.load(Ordering::Acquire);
+                    if last_minimize > 0 && (now - last_minimize) < 200 {
+                        // Tray icon has been clicked less than 200ms after a focus loss minimize, ignore it
+                        // This prevents immediate reopening when the window is minimized by focus loss
+                        return;
+                    }
+
+                    window::show_main_window(&app_handle);
+                }
+                _ => {}
             }
         })
         .menu(&menu)

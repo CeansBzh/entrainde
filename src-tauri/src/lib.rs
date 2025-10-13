@@ -1,7 +1,11 @@
 mod tray;
 mod window;
 
-use std::sync::Arc;
+use std::sync::{
+    atomic::{AtomicU64, Ordering},
+    Arc,
+};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
 use tauri::{Manager, State, Window, WindowEvent, Wry};
@@ -15,6 +19,7 @@ struct Task {
 
 pub struct AppState {
     store: Arc<Store<Wry>>,
+    last_focus_loss_minimize: Arc<AtomicU64>,
 }
 
 #[tauri::command]
@@ -170,17 +175,36 @@ pub fn run() {
                 eprintln!("Failed to cleanup old tasks: {}", e);
             }
 
-            app.manage(AppState { store });
+            app.manage(AppState {
+                store,
+                last_focus_loss_minimize: Arc::new(AtomicU64::new(0)),
+            });
 
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![add_task, get_tasks, search_tasks])
         .on_window_event(|window: &Window, event: &WindowEvent| {
-            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                // Minimize to tray instead of closing the window
-                let app_handle = window.app_handle();
-                window::hide_main_window(&app_handle);
-                api.prevent_close();
+            match event {
+                tauri::WindowEvent::CloseRequested { api, .. } => {
+                    // Minimize to tray instead of closing the window
+                    let app_handle = window.app_handle();
+                    window::hide_main_window(&app_handle);
+                    api.prevent_close();
+                }
+                tauri::WindowEvent::Focused(false) => {
+                    let app_handle = window.app_handle();
+                    let state = app_handle.state::<AppState>();
+                    
+                    // Record the current time when minimizing due to focus loss
+                    let now = SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .unwrap()
+                        .as_millis() as u64;
+                    state.last_focus_loss_minimize.store(now, Ordering::Release);
+                    
+                    window::hide_main_window(&app_handle);
+                }
+                _ => {}
             }
         })
         .run(tauri::generate_context!())
