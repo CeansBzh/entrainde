@@ -13,11 +13,22 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "entrainde",
+        "title": "Entrainde",
         "width": 400,
         "height": 250,
         "visible": false,
         "skipTaskbar": true
+      },
+      {
+        "label": "timeline",
+        "title": "Historique des tâches - Entrainde",
+        "url": "timeline.html",
+        "width": 800,
+        "height": 600,
+        "visible": false,
+        "resizable": true,
+        "minimizable": true,
+        "maximizable": true
       }
     ],
     "security": {

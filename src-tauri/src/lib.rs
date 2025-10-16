@@ -8,7 +8,7 @@ use std::sync::{
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
-use tauri::{Manager, State, Window, WindowEvent, Wry};
+use tauri::{AppHandle, Emitter, Manager, State, Window, WindowEvent, Wry};
 use tauri_plugin_store::{Store, StoreExt};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -23,7 +23,7 @@ pub struct AppState {
 }
 
 #[tauri::command]
-async fn add_task(name: String, state: State<'_, AppState>) -> Result<(), String> {
+async fn add_task(name: String, state: State<'_, AppState>, app_handle: AppHandle) -> Result<(), String> {
     let task = Task {
         name: name.clone(),
         timestamp: std::time::SystemTime::now()
@@ -40,7 +40,7 @@ async fn add_task(name: String, state: State<'_, AppState>) -> Result<(), String
         .unwrap_or_default();
 
     // Add new task
-    tasks.push(task);
+    tasks.push(task.clone());
 
     // Save tasks
     state.store.set(
@@ -48,6 +48,8 @@ async fn add_task(name: String, state: State<'_, AppState>) -> Result<(), String
         serde_json::to_value(&tasks).map_err(|e| e.to_string())?,
     );
     state.store.save().map_err(|e| e.to_string())?;
+
+    let _ = app_handle.emit("task-added", &task);
 
     Ok(())
 }
@@ -104,6 +106,12 @@ async fn search_tasks(query: String, state: State<'_, AppState>) -> Result<Vec<S
     });
 
     Ok(result)
+}
+
+#[tauri::command]
+async fn open_timeline(app_handle: tauri::AppHandle) -> Result<(), String> {
+    window::show_timeline_window(&app_handle);
+    Ok(())
 }
 
 pub fn clear_all_tasks(state: State<'_, AppState>) -> Result<(), String> {
@@ -182,29 +190,36 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![add_task, get_tasks, search_tasks])
+        .invoke_handler(tauri::generate_handler![
+            add_task,
+            get_tasks,
+            search_tasks,
+            open_timeline
+        ])
         .on_window_event(|window: &Window, event: &WindowEvent| {
-            match event {
-                tauri::WindowEvent::CloseRequested { api, .. } => {
-                    // Minimize to tray instead of closing the window
-                    let app_handle = window.app_handle();
-                    window::hide_main_window(&app_handle);
-                    api.prevent_close();
+            if window.label() == "main" {
+                match event {
+                    tauri::WindowEvent::CloseRequested { api, .. } => {
+                        // Minimize to tray instead of closing the window
+                        let app_handle = window.app_handle();
+                        window::hide_main_window(&app_handle);
+                        api.prevent_close();
+                    }
+                    tauri::WindowEvent::Focused(false) => {
+                        let app_handle = window.app_handle();
+                        let state = app_handle.state::<AppState>();
+
+                        // Record the current time when minimizing due to focus loss
+                        let now = SystemTime::now()
+                            .duration_since(UNIX_EPOCH)
+                            .unwrap()
+                            .as_millis() as u64;
+                        state.last_focus_loss_minimize.store(now, Ordering::Release);
+
+                        window::hide_main_window(&app_handle);
+                    }
+                    _ => {}
                 }
-                tauri::WindowEvent::Focused(false) => {
-                    let app_handle = window.app_handle();
-                    let state = app_handle.state::<AppState>();
-                    
-                    // Record the current time when minimizing due to focus loss
-                    let now = SystemTime::now()
-                        .duration_since(UNIX_EPOCH)
-                        .unwrap()
-                        .as_millis() as u64;
-                    state.last_focus_loss_minimize.store(now, Ordering::Release);
-                    
-                    window::hide_main_window(&app_handle);
-                }
-                _ => {}
             }
         })
         .run(tauri::generate_context!())

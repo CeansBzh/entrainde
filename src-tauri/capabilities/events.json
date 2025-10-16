@@ -1,0 +1,9 @@
+{
+  "identifier": "event-listening",
+  "description": "Allow listening to events",
+  "local": true,
+  "windows": ["timeline"],
+  "permissions": [
+    "core:event:allow-listen"
+  ]
+}

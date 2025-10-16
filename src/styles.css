@@ -1,24 +1,77 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
 }
 
-.logo.typescript:hover {
-  filter: drop-shadow(0 0 2em #2d79c7);
-}
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
 
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  /* Colors */
+  --color-primary-50: #e3f0fc;
+  --color-primary-100: #d1e6fa;
+  --color-primary-200: #bfdcf8;
+  --color-primary-300: #95c6f3;
+  --color-primary-400: #6cb0ef;
+  --color-primary-500: #439aea;
+  --color-primary-600: #1984e6;
+  --color-primary-700: #156cbc;
+  --color-primary-800: #105493;
+  --color-primary-900: #112a41;
+  --color-primary-950: #0a1f33;
+
+  --color-surface-0: #ffffff;
+  --color-surface-50: #fafafa;
+  --color-surface-100: #f5f5f5;
+  --color-surface-200: #e5e5e5;
+  --color-surface-300: #d4d4d4;
+  --color-surface-400: #a3a3a3;
+  --color-surface-500: #737373;
+  --color-surface-600: #525252;
+  --color-surface-700: #404040;
+  --color-surface-800: #262626;
+  --color-surface-900: #171717;
+  --color-surface-950: #0a0a0a;
+
+  --color-success: #4caf50;
+  --color-error: #f44336;
+
+  color: var(--color-surface-900);
+  background-color: var(--color-surface-100);
+}
+
+body {
+  line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+p {
+  margin: 0;
 }
 
 .container {
@@ -28,6 +81,42 @@
   flex-direction: column;
   justify-content: center;
   text-align: center;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 1em;
+}
+
+.timeline-btn {
+  position: absolute;
+  right: 0;
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-btn:hover {
+  color: #007acc;
+  background-color: rgba(0, 122, 204, 0.1);
+  transform: scale(1.05);
+}
+
+.timeline-btn:active {
+  transform: scale(0.95);
 }
 
 .logo {
@@ -81,6 +170,7 @@ button {
 button:hover {
   border-color: #396cd8;
 }
+
 button:active {
   border-color: #396cd8;
   background-color: #e8e8e8;
@@ -139,39 +229,6 @@ button {
 #status-msg {
   margin-top: 1em;
   min-height: 1.5em;
-  color: #4caf50;
+  color: var(--color-success);
   font-weight: 500;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
-
-  .suggestions {
-    background-color: #1f1f1f;
-    border-color: #444;
-  }
-
-  .suggestion-item:hover {
-    background-color: #333;
-  }
-
-  #status-msg {
-    color: #81c784;
-  }
 }

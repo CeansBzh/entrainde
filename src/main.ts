@@ -86,6 +86,16 @@ async function handleSubmit(e: Event): Promise<void> {
   }
 }
 
+// Open timeline window
+async function openTimeline(): Promise<void> {
+  try {
+    await invoke("open_timeline");
+  } catch (error) {
+    console.error("Error opening timeline:", error);
+    showError("Erreur lors de l'ouverture de l'historique");
+  }
+}
+
 // Initialize the app
 window.addEventListener("DOMContentLoaded", () => {
   taskInputEl = document.querySelector("#task-input");
@@ -97,6 +107,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // Handle form submission
   document.querySelector("#task-form")?.addEventListener("submit", handleSubmit);
+
+  // Handle timeline button click
+  document.querySelector("#timeline-btn")?.addEventListener("click", openTimeline);
 
   // Handle input changes for suggestions
   taskInputEl?.addEventListener("input", (e) => {

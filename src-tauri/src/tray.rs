@@ -11,6 +11,7 @@ use crate::{clear_all_tasks, window, AppState};
 pub fn create(app_handle: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     // Create the tray menu
     let open_i = MenuItem::with_id(app_handle, "open", "Ouvrir", true, None::<&str>)?;
+    let timeline_i = MenuItem::with_id(app_handle, "timeline", "Voir historique", true, None::<&str>)?;
     let clear_i = MenuItem::with_id(
         app_handle,
         "clear",
@@ -19,7 +20,7 @@ pub fn create(app_handle: &AppHandle) -> Result<(), Box<dyn std::error::Error>> 
         None::<&str>,
     )?;
     let quit_i = MenuItem::with_id(app_handle, "quit", "Quitter", true, None::<&str>)?;
-    let menu = Menu::with_items(app_handle, &[&open_i, &clear_i, &quit_i])?;
+    let menu = Menu::with_items(app_handle, &[&open_i, &timeline_i, &clear_i, &quit_i])?;
 
     TrayIconBuilder::new()
         .icon(app_handle.default_window_icon().unwrap().clone())
@@ -60,6 +61,9 @@ pub fn create(app_handle: &AppHandle) -> Result<(), Box<dyn std::error::Error>> 
             }
             "open" => {
                 window::show_main_window(app_handle);
+            }
+            "timeline" => {
+                window::show_timeline_window(app_handle);
             }
             "clear" => {
                 clear_all_tasks(app_handle.state::<crate::AppState>()).unwrap();

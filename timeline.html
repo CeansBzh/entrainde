@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/timeline.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Historique des tâches - Entrainde</title>
+    <script type="module" src="/src/timeline.ts" defer></script>
+  </head>
+
+  <body>
+    <main class="timeline-container">
+      <header class="timeline-header">
+        <h1>Historique des tâches</h1>
+      </header>
+      
+      <div id="timeline-content" class="timeline-content">
+        <div id="timeline-loading" class="timeline-loading">
+          <p>Chargement...</p>
+        </div>
+        <div id="timeline-empty" class="timeline-empty" style="display: none;">
+          <p>Aucune tâche enregistrée pour aujourd'hui</p>
+        </div>
+        <ol id="timeline-list" class="timeline-list">
+        </ol>
+      </div>
+    </main>
+  </body>
+</html>
